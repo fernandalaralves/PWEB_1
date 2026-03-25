@@ -166,4 +166,15 @@ Mini sistema contendo:
 
 1. Instalar o **XAMPP**
 2. Iniciar o **Apache**
-3. Copiar a pasta `unidade-1` para:
+3. Copiar a pasta `unidade-1` para: C:\xampp\htdocs\
+4. Abrir o navegador e acessar: http://localhost/unidade_1/
+5. Navegar até a atividade desejada.
+
+Exemplo:
+
+
+http://localhost/unidade_1/atividade-1-classificacao/classificacao.php
+
+
+---
+
