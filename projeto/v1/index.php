@@ -5,7 +5,8 @@ $perfil = [
     'campus'       => 'IFCE Campus Boa Viagem',
     'cidade'       => 'Boa Viagem – CE',
     'apresentacao' => 'Sou estudante com interesse em '
-                    . 'desenvolvimento backend, em cibersegurança e QA'
+                    . 'desenvolvimento backend,'
+                    . ' em cibersegurança e QA. '
                     . 'Gosto de construir sistemas que resolvem problemas reais. ',
     'habilidades'  => [
         'Java', 'Spring Boot', 'PostgreSQL', 'JavaScript',
@@ -155,7 +156,7 @@ function e($texto) {
                     <?= e($perfil['nome']) ?> — <?= e($perfil['curso']) ?>
                     | <?= e($perfil['campus']) ?>
                 </p>
-                <a href="?pagina=projetos" class="btn-primario">CONECTE-SE COMIGO →</a>
+                <a href="https://github.com/fernandalaralves" class="btn-primario" target="_blank" rel="noopener noreferrer">CONECTE-SE COMIGO →</a>
             </section>
 
             <!-- sobre mim -->
