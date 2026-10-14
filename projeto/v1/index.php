@@ -44,6 +44,29 @@ $projetos = [
     ],
 ];
 
+//tema: claro ou escuro (R6)
+$tema = $_GET['tema'] ?? $_COOKIE['tema'] ?? 'escuro';
+
+// R6: validação — só aceita 'claro' ou 'escuro'
+if ($tema !== 'claro' && $tema !== 'escuro') {
+    $tema = 'escuro';
+}
+
+// Se veio pela URL, grava cookie de 30 dias.
+// (setcookie não aparece em $_COOKIE na mesma requisição — só na próxima.)
+if (isset($_GET['tema'])) {
+    setcookie('tema', $tema, [
+        'expires'  => time() + (30 * 24 * 60 * 60),
+        'path'     => '/',
+        'httponly' => true,
+        'samesite' => 'Lax',
+    ]);
+}
+
+$temaLabel   = $tema;
+$proximoTema = $tema === 'escuro' ? 'claro' : 'escuro';
+
+
 
 // pagina a mostrar
 $pagina = $_GET['pagina'] ?? 'inicio';
@@ -84,7 +107,7 @@ function e($texto) {
     <title><?= e($perfil['nome']) ?> — Perfil</title>
     <link rel="stylesheet" href="style.css">
 </head>
-<body class="tema-escuro">
+<body class="tema-<?= e($tema) ?>">
 
 <!-- menu e cabecalho -->
 
@@ -95,7 +118,13 @@ function e($texto) {
                 <a href="?pagina=inicio">Início</a>
                 <a href="?pagina=habilidades">Habilidades</a>
                 <a href="?pagina=projetos">Projetos</a>
-            </nav>
+                 </nav>
+            <div class="cabecalho__acoes">
+                <a class="btn-tema"
+                   href="?pagina=<?= e($pagina) ?>&tema=<?= e($proximoTema) ?>">
+                    Trocar Tema
+                </a>
+          </div> 
         </div>
     </header>
 
@@ -226,7 +255,7 @@ function e($texto) {
 
     <footer class="rodape">
         <div class="container rodape__inner">
-            <p>© <?= date('Y') ?> <?= e($perfil['nome']) ?></p>
+            <p>© <?= date('Y') ?> <?= e($perfil['nome']) ?>— Tema: <?= e($temaLabel) ?></p>
             <p class="rodape__links">
                 <a href="https://github.com/fernandalaralves" target="_blank">GitHub</a>
             </p>
