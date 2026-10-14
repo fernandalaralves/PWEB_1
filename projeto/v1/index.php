@@ -47,6 +47,27 @@ $projetos = [
 
 // pagina a mostrar
 $pagina = $_GET['pagina'] ?? 'inicio';
+// Status HTTP padrão; pode virar 404 mais abaixo
+$status = 200;
+
+// Rota de detalhe de projeto (R4)
+$projetoAtual = null;
+if ($pagina === 'projeto') {
+    $id = (int) ($_GET['id'] ?? 0);
+    if (isset($projetos[$id])) {
+        $projetoAtual = $projetos[$id];
+    } else {
+        $status = 404;
+    }
+}
+
+// Rota desconhecida → 404 (R3)
+if (!in_array($pagina, ['inicio', 'habilidades', 'projetos', 'projeto'], true)) {
+    $status = 404;
+}
+
+// Define o status ANTES de qualquer HTML
+http_response_code($status);
 
 
 
@@ -150,12 +171,55 @@ function e($texto) {
                     <?php endforeach; ?>
                 </div>
             </section>
+                    <?php elseif ($pagina === 'projeto' && $projetoAtual !== null): ?>
+
+            <!-- ---------- detalhes de um projetoo (R4) ---------- -->
+            <section class="secao detalhe">
+                <p class="secao__eyebrow">PROJETO</p>
+                <h2 class="secao__titulo"><?= e($projetoAtual['titulo']) ?></h2>
+                <p class="detalhe__desc"><?= e($projetoAtual['descricao']) ?></p>
+
+                <h3 class="detalhe__sub">Tecnologias</h3>
+                <ul class="tags tags--grandes">
+                    <?php foreach (explode(',', $projetoAtual['tecnologias']) as $t): ?>
+                        <li><?= e(trim($t)) ?></li>
+                    <?php endforeach; ?>
+                </ul>
+
+                <?php if ($projetoAtual['privado']): ?>
+                    <p class="aviso-privado"> Repositório privado</p>
+                <?php elseif ($projetoAtual['link']): ?>
+                    <a class="btn-primario" target="_blank"
+                       href="<?= e($projetoAtual['link']) ?>">
+                        Abrir projeto →
+                    </a>
+                <?php endif; ?>
+
+                <p class="voltar">
+                    <a href="?pagina=projetos">← Voltar para projetos</a>
+                </p>
+            </section>
+
+        <?php elseif ($pagina === 'projeto'): ?>
+
+            <!-- ---------- projeto nao encontrado (404) ---------- -->
+            <section class="secao erro-404">
+                <p class="secao__eyebrow">ERRO 404</p>
+                <h2 class="secao__titulo">Projeto não encontrado</h2>
+                <p>O projeto <code>#<?= e($_GET['id'] ?? '?') ?></code> não existe.</p>
+                <a href="?pagina=projetos" class="btn-primario">Ver todos os projetos</a>
+            </section>
 
         <?php else: ?>
-            <section class="secao">
-                <p class="secao__eyebrow">PÁGINA NÃO ENCONTRADA</p>
-                <h2 class="secao__titulo">Conteúdo indisponível.</h2>
+
+            <!-- ---------- pagina nao encontrada (404) ---------- -->
+            <section class="secao erro-404">
+                <p class="secao__eyebrow">ERRO 404</p>
+                <h2 class="secao__titulo">Página não encontrada</h2>
+                <p>A rota <code><?= e($pagina) ?></code> não existe neste site.</p>
+                <a href="?pagina=inicio" class="btn-primario">Voltar para o início</a>
             </section>
+
         <?php endif; ?>
 
     </main>
