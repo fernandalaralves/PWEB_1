@@ -52,6 +52,15 @@ if ($tema !== 'claro' && $tema !== 'escuro') {
     $tema = 'escuro';
 }
 
+if (($_GET['formato'] ?? null) === 'json') {
+    header('Content-Type: application/json; charset=utf-8');
+    echo json_encode(
+        ['perfil' => $perfil, 'projetos' => $projetos],
+        JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE
+    );
+    exit;
+}
+
 // Se veio pela URL, grava cookie de 30 dias.
 // (setcookie não aparece em $_COOKIE na mesma requisição — só na próxima.)
 if (isset($_GET['tema'])) {
@@ -256,7 +265,8 @@ function e($texto) {
     <footer class="rodape">
         <div class="container rodape__inner">
             <p>© <?= date('Y') ?> <?= e($perfil['nome']) ?>— Tema: <?= e($temaLabel) ?></p>
-            <p class="rodape__links">
+            <p class="rodape__link">
+                <a href="?formato=json">Versão JSON</a>
                 <a href="https://github.com/fernandalaralves" target="_blank">GitHub</a>
             </p>
         </div>
