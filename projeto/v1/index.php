@@ -61,11 +61,11 @@ function e($texto) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= e($perfil['nome']) ?> — Perfil</title>
-    <link rel="stylesheet" href="estilo.css">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body class="tema-escuro">
 
-//menu e cabecalho 
+<!-- menu e cabecalho -->
 
     <header class="cabecalho">
         <div class="container cabecalho__inner">
@@ -78,7 +78,7 @@ function e($texto) {
         </div>
     </header>
 
-    //conteudo 
+    <!-- conteudo -->
     <main class="container">
 
         <?php if ($pagina === 'inicio'): ?>
@@ -99,7 +99,7 @@ function e($texto) {
                 <a href="?pagina=projetos" class="btn-primario">CONECTE-SE COMIGO →</a>
             </section>
 
-         //sobre mim
+            <!-- sobre mim -->
             <section class="sobre">
                 <p class="secao__eyebrow">SOBRE MIM</p>
                 <h2 class="secao__titulo">Código com propósito.</h2>
@@ -107,14 +107,55 @@ function e($texto) {
                 <p class="sobre__local"><?= e($perfil['cidade']) ?></p>
             </section>
 
-        <?php else: ?>
+        <?php elseif ($pagina === 'habilidades'): ?>
 
-            //rotas para implementar
+            <!-- habilidades -->
             <section class="secao">
-                <h2 class="secao__titulo">Em construção</h2>
-                <p>A página <code><?= e($pagina) ?></code> ainda será implementada.</p>
+                <p class="secao__eyebrow">EXPERIÊNCIA & FERRAMENTAS</p>
+                <h2 class="secao__titulo">Habilidades</h2>
+
+                <ul class="grid-habilidades">
+                    <?php foreach ($perfil['habilidades'] as $h): ?>
+                        <li class="pill"><?= e($h) ?></li>
+                    <?php endforeach; ?>
+                </ul>
+
+                <p class="contador">
+                    <?= count($perfil['habilidades']) ?> habilidades
+                </p>
             </section>
 
+        <?php elseif ($pagina === 'projetos'): ?>
+
+            <!-- projetos -->
+            <section class="secao">
+                <p class="secao__eyebrow">PORTFÓLIO</p>
+                <h2 class="secao__titulo">Projetos</h2>
+
+                <div class="grid-projetos">
+                    <?php foreach ($projetos as $id => $p): ?>
+                        <article class="card-projeto">
+                            <h3 class="card-projeto__titulo"><?= e($p['titulo']) ?></h3>
+                            <p class="card-projeto__desc"><?= e($p['descricao']) ?></p>
+                            <ul class="tags">
+                                <?php foreach (explode(',', $p['tecnologias']) as $t): ?>
+                                    <li><?= e(trim($t)) ?></li>
+                                <?php endforeach; ?>
+                            </ul>
+                            <a class="card-projeto__link"
+                               href="?pagina=projeto&id=<?= e($id) ?>">
+                                Ver detalhes →
+                            </a>
+                        </article>
+                    <?php endforeach; ?>
+                </div>
+            </section>
+
+        <?php else: ?>
+            <section class="secao">
+                <p class="secao__eyebrow">PÁGINA NÃO ENCONTRADA</p>
+                <h2 class="secao__titulo">Conteúdo indisponível.</h2>
+            </section>
         <?php endif; ?>
 
     </main>
