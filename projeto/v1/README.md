@@ -44,6 +44,20 @@ Abra **http://localhost:8000**. Para parar: `Ctrl + C`.
 | `/?formato=json` | Dados em JSON | 200 |
 
 ---
+## Estrutura de arquivos
+
+```
+projeto/v1/
+├── index.php          → aplicação completa (rotas, dados, HTML)
+├── style.css          → visual, com os dois temas (claro e escuro)
+├── foto-perfil.jpeg   → foto exibida na seção "Sobre mim"
+├── README.md          → este documento
+└── prints/
+    ├── claro.png
+    └── escuro.png
+```
+
+---
 
 ## Saídas do terminal
 
