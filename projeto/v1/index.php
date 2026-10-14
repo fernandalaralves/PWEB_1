@@ -16,7 +16,7 @@ $perfil = [
 
 $projetos = [
     1 => [
-        'titulo'      => 'pure_seduction_lux',
+        'titulo'      => 'Pure Seduction Lux',
         'descricao'   => 'Sistema de e-commerce completo — loja virtual e painel '
                        . 'administrativo — com API REST, autenticação JWT e banco '
                        . 'de dados relacional PostgreSQL.',
@@ -73,7 +73,6 @@ if (isset($_GET['tema'])) {
     ]);
 }
 
-$temaLabel   = $tema;
 $proximoTema = $tema === 'escuro' ? 'claro' : 'escuro';
 
 
@@ -162,9 +161,12 @@ function e($texto) {
             <!-- sobre mim -->
             <section class="sobre">
                 <p class="secao__eyebrow">SOBRE MIM</p>
-                <h2 class="secao__titulo">Código com propósito.</h2>
+                <img
+                    src="foto-perfil.jpeg"
+                    alt="Foto de Fernanda"
+                    class="sobre__foto"
+                >
                 <p class="sobre__texto"><?= e($perfil['apresentacao']) ?></p>
-                <p class="sobre__local"><?= e($perfil['cidade']) ?></p>
             </section>
 
         <?php elseif ($pagina === 'habilidades'): ?>
@@ -180,9 +182,6 @@ function e($texto) {
                     <?php endforeach; ?>
                 </ul>
 
-                <p class="contador">
-                    <?= count($perfil['habilidades']) ?> habilidades
-                </p>
             </section>
 
         <?php elseif ($pagina === 'projetos'): ?>
@@ -265,7 +264,7 @@ function e($texto) {
 
     <footer class="rodape">
         <div class="container rodape__inner">
-            <p>© <?= date('Y') ?> <?= e($perfil['nome']) ?>— Tema: <?= e($temaLabel) ?></p>
+            <p>© <?= date('Y') ?> <?= e($perfil['nome']) ?></p>
             <p class="rodape__link">
                 <a href="?formato=json">Versão JSON</a>
                 <a href="https://github.com/fernandalaralves" target="_blank">GitHub</a>

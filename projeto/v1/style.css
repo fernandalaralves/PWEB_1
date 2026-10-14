@@ -247,38 +247,16 @@ code { font-family: 'Space Grotesk', monospace; }
     max-width: 55ch;
     margin-top: .5rem;
 }
-.sobre__local {
-    margin-top: 1.2rem;
-    color: var(--texto-suave);
-    font-size: .9rem;
-}
 .sobre__foto {
+    width: 100%;
     aspect-ratio: 1;
     max-width: 340px;
     justify-self: center;
     border-radius: 24px;
-    background:
-        radial-gradient(circle at 50% 50%,
-            color-mix(in srgb, var(--destaque) 25%, transparent) 0%,
-            transparent 60%),
-        var(--fundo-card);
     border: 1px solid var(--borda-forte);
-    display: grid;
-    place-items: center;
-    color: var(--texto-suave);
-    font-size: .85rem;
-    position: relative;
+    object-fit: cover;
     overflow: hidden;
 }
-.sobre__foto::before,
-.sobre__foto::after {
-    content: '';
-    position: absolute;
-    border-radius: 50%;
-    border: 1px solid var(--borda-forte);
-}
-.sobre__foto::before { inset: 18%; }
-.sobre__foto::after  { inset: 32%; }
 
 /* ---------- HABILIDADES ---------- */
 .grid-habilidades {
@@ -300,12 +278,6 @@ code { font-family: 'Space Grotesk', monospace; }
     border-color: var(--destaque);
     box-shadow: var(--glow);
 }
-.contador {
-    margin-top: 1.5rem;
-    color: var(--texto-suave);
-    font-size: .85rem;
-}
-
 /* ---------- PROJETOS ---------- */
 .grid-projetos {
     display: grid;
@@ -313,6 +285,8 @@ code { font-family: 'Space Grotesk', monospace; }
     gap: 1.5rem;
 }
 .card-projeto {
+    position: relative;
+    overflow: hidden;
     padding: 1.8rem;
     border-radius: 20px;
     background: var(--fundo-card);
@@ -320,5 +294,51 @@ code { font-family: 'Space Grotesk', monospace; }
     display: flex;
     flex-direction: column;
     gap: 1rem;
-    transition: transform .25s ;
+    transition: transform .25s, border-color .25s, box-shadow .25s;
+}
+.card-projeto::before {
+    content: '';
+    position: absolute;
+    inset: 0 0 auto;
+    height: 3px;
+    background: var(--grad);
+    opacity: .8;
+}
+.card-projeto:hover {
+    transform: translateY(-5px);
+    border-color: var(--borda-forte);
+    box-shadow: var(--glow);
+}
+.card-projeto__titulo {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1.2rem;
+    line-height: 1.35;
+}
+.card-projeto__desc {
+    color: var(--texto-suave);
+    line-height: 1.7;
+}
+.tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .5rem;
+}
+.tags li {
+    padding: .3rem .65rem;
+    border: 1px solid var(--borda);
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--destaque) 7%, var(--fundo-card));
+    color: var(--texto-suave);
+    font-size: .75rem;
+}
+.card-projeto__link {
+    align-self: flex-start;
+    margin-top: auto;
+    padding-top: .4rem;
+    color: var(--destaque);
+    font-weight: 600;
+    transition: color .2s;
+}
+.card-projeto__link:hover {
+    color: var(--texto);
 }
