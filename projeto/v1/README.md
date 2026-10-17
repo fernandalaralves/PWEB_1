@@ -33,15 +33,15 @@ Abra **http://localhost:8000**. Para parar: `Ctrl + C`.
 
 | URL | Mostra | Status |
 |---|---|---|
-| `/` ou `/?pagina=inicio` | Apresentação pessoal | 200 |
-| `/?pagina=habilidades` | Habilidades + total | 200 |
-| `/?pagina=projetos` | Lista dos 3 projetos | 200 |
-| `/?pagina=projeto&id=1` | Detalhes do projeto 1 | 200 |
-| `/?pagina=projeto&id=99` | "Projeto não encontrado" | 404 |
-| `/?pagina=xyz` | "Página não encontrada" | 404 |
-| `/?tema=escuro` | Tema escuro gravado em cookie | 200 |
-| `/?tema=claro` | Tema claro gravado em cookie | 200 |
-| `/?formato=json` | Dados em JSON | 200 |
+| `/` ou `/?pagina=inicio` | Apresentação pessoal          | 200 |
+| `/?pagina=habilidades`   | Habilidades + quantidade total | 200 |
+| `/?pagina=projetos`      | Lista dos 3 projetos          | 200 |
+| `/?pagina=projeto&id=1`  | Detalhes do projeto 1         | 200 |
+| `/?pagina=projeto&id=99` | "Projeto não encontrado"      | 404 |
+| `/?pagina=xyz`           | "Página não encontrada"       | 404 |
+| `/?tema=escuro`          | Tema escuro gravado em cookie | 200 |
+| `/?tema=claro`           | Tema claro gravado em cookie  | 200 |
+| `/?formato=json`         | Dados em JSON                 | 200 |
 
 ---
 ## Estrutura de arquivos
@@ -67,10 +67,11 @@ curl.exe -i "http://localhost:8000/?pagina=inicio"
 ```
 ```
 HTTP/1.1 200 OK
-Content-Type: text/html; charset=UTF-8
+Content-Type: text/html; charset=utf-8
 <!DOCTYPE html>...
 ```
 `200 OK` = sucesso. O corpo é o HTML da página inicial.
+O PHP define `Content-Type: text/html; charset=utf-8` antes de iniciar o HTML.
 
 ### Página inexistente (404)
 ```bash
@@ -107,6 +108,15 @@ Set-Cookie: tema=escuro; Max-Age=2592000; HttpOnly; SameSite=Lax
 Cookie válido por **30 dias**. Ele **não** aparece em `$_COOKIE` na mesma
 requisição — só na próxima. Por isso a URL tem prioridade:
 `$tema = $_GET['tema'] ?? $_COOKIE['tema'] ?? 'escuro';`
+
+Para demonstrar a persistência entre requisições no terminal, salve o cookie
+recebido e envie-o na chamada seguinte:
+```bash
+curl.exe -i -c cookies.txt "http://localhost:8000/?tema=claro"
+curl.exe -i -b cookies.txt "http://localhost:8000/?pagina=habilidades"
+```
+Na segunda resposta, confira `<body class="tema-claro">`. No navegador, a
+mesma persistência pode ser demonstrada trocando de página ou recarregando.
 
 ### Tema inválido
 ```bash
@@ -150,12 +160,13 @@ Content-Type: application/json; charset=utf-8
 | `setcookie()` | Bloco que grava o tema quando vem pela URL |
 | `if / elseif / else` | Escolhe qual seção renderizar |
 | `http_response_code()` | 404 para página/projeto inexistente |
-| `header()` | `Content-Type: application/json` |
+| `header()` | Define `Content-Type` para HTML ou JSON |
 | `json_encode()` | Rota JSON (com `PRETTY_PRINT` + `UNESCAPED_UNICODE`) |
 | `exit` | Encerra após o JSON |
 | `htmlspecialchars()` | Função `e()` em toda saída |
-| `count()` | Total de habilidades |
-| `explode()` + `trim()` | Tags de tecnologia dos projetos |
+| `count()` | Exibe a quantidade de habilidades na página de habilidades |
+| `implode()` | Resume as três tecnologias principais em cada card de projeto |
+| Arrays de tecnologias | Alimentam o resumo dos cards, os detalhes e a resposta JSON |
 | Sintaxe `if: endif;` | Nos blocos de HTML alternados |
 | `date('Y')` | Ano no rodapé |
 
@@ -170,6 +181,16 @@ Content-Type: application/json; charset=utf-8
 **Validar o tema:** o valor vem da URL e é controlado pelo usuário. Aceitar
 só `claro`/`escuro` (allowlist) evita que algo como `?tema=<script>` seja
 refletido no `<body>`.
+
+**Detalhes por ID:** os IDs são as chaves do array `$projetos`. A página busca
+o projeto nessa estrutura; se a chave não existir, define status HTTP `404`.
+O botão de tema mantém o ID quando usado dentro dos detalhes.
+
+**Arrays e apresentação:** as tecnologias são armazenadas como arrays, não
+como texto separado por vírgulas. `implode()` monta um resumo curto para os
+cards, enquanto a página de detalhes percorre o array completo. `count()`
+conta as habilidades para exibir o total sem manter um número duplicado no
+código.
 
 **URL antes do cookie:** `setcookie()` grava na resposta, mas o cookie só
 volta em `$_COOKIE` na **próxima** requisição. Se o cookie tivesse
