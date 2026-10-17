@@ -20,7 +20,7 @@ $projetos = [
         'descricao'   => 'Sistema de e-commerce completo — loja virtual e painel '
                        . 'administrativo — com API REST, autenticação JWT e banco '
                        . 'de dados relacional PostgreSQL.',
-        'tecnologias' => 'Node.js, Express, React, Vite, PostgreSQL, JWT, Argon2id',
+        'tecnologias' => ['Node.js', 'Express', 'React', 'Vite', 'PostgreSQL', 'JWT', 'Argon2id'],
         'link'        => 'https://pureseductionlux.com.br',
         'privado'     => false,
     ],
@@ -29,7 +29,7 @@ $projetos = [
         'descricao'   => 'Jogo educativo de cibersegurança para crianças de 8 a 14 '
                        . 'anos, com narrativa interativa em que a personagem Maya '
                        . 'restaura a internet completando missões.',
-        'tecnologias' => 'Vite 5, Vanilla JS, Web Components, Shadow DOM, Tailwind CSS, LocalStorage',
+        'tecnologias' => ['Vite 5', 'Vanilla JS', 'Web Components', 'Shadow DOM', 'Tailwind CSS', 'LocalStorage'],
         'link'        => 'https://github.com/fernandalaralves/A-Aventura-de-Maya-na-Internet',
         'privado'     => false,
     ],
@@ -39,7 +39,7 @@ $projetos = [
                        . 'alfabetização (psicogênese da língua escrita). Atuei no '
                        . 'backend mobile em Java/Spring Boot, com autenticação JWT, '
                        . 'rate limiting e integração com IA (LUN.AI).',
-        'tecnologias' => 'Java, Spring Boot, Spring Data JPA, Spring Security, JWT, Bucket4j, Lombok, Argon',
+        'tecnologias' => ['Java', 'Spring Boot', 'Spring Data JPA', 'Spring Security', 'JWT', 'Bucket4j', 'Lombok', 'Argon'],
         'link'        => null,
         'privado'     => true,
     ],
@@ -53,15 +53,6 @@ if ($tema !== 'claro' && $tema !== 'escuro') {
     $tema = 'escuro';
 }
 
-if (($_GET['formato'] ?? null) === 'json') {
-    header('Content-Type: application/json; charset=utf-8');
-    echo json_encode(
-        ['perfil' => $perfil, 'projetos' => $projetos],
-        JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE
-    );
-    exit;
-}
-
 // Se veio pela URL, grava cookie de 30 dias.
 // (setcookie não aparece em $_COOKIE na mesma requisição — só na próxima.)
 if (isset($_GET['tema'])) {
@@ -72,6 +63,17 @@ if (isset($_GET['tema'])) {
         'samesite' => 'Lax',
     ]);
 }
+
+if (($_GET['formato'] ?? null) === 'json') {
+    header('Content-Type: application/json; charset=utf-8');
+    echo json_encode(
+        ['perfil' => $perfil, 'projetos' => $projetos],
+        JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE
+    );
+    exit;
+}
+
+header('Content-Type: text/html; charset=utf-8');
 
 $proximoTema = $tema === 'escuro' ? 'claro' : 'escuro';
 
@@ -84,10 +86,11 @@ $status = 200;
 
 // Rota de detalhe de projeto (R4)
 $projetoAtual = null;
+$projetoId = null;
 if ($pagina === 'projeto') {
-    $id = (int) ($_GET['id'] ?? 0);
-    if (isset($projetos[$id])) {
-        $projetoAtual = $projetos[$id];
+    $projetoId = filter_var($_GET['id'] ?? null, FILTER_VALIDATE_INT);
+    if (is_int($projetoId) && isset($projetos[$projetoId])) {
+        $projetoAtual = $projetos[$projetoId];
     } else {
         $status = 404;
     }
@@ -130,7 +133,7 @@ function e($texto) {
                  </nav>
             <div class="cabecalho__acoes">
                 <a class="btn-tema"
-                   href="?pagina=<?= e($pagina) ?>&tema=<?= e($proximoTema) ?>">
+                         href="?pagina=<?= e($pagina) ?><?= $projetoId !== null && $projetoAtual !== null ? '&id=' . e($projetoId) : '' ?>&tema=<?= e($proximoTema) ?>">
                     Trocar Tema
                 </a>
           </div> 
@@ -175,10 +178,11 @@ function e($texto) {
             <section class="secao">
                 <p class="secao__eyebrow">EXPERIÊNCIA & FERRAMENTAS</p>
                 <h2 class="secao__titulo">Habilidades</h2>
+                <p class="secao__sub"> <?= count($perfil['habilidades']) ?> habilidades</p>
 
                 <ul class="grid-habilidades">
-                    <?php foreach ($perfil['habilidades'] as $h): ?>
-                        <li class="pill"><?= e($h) ?></li>
+                    <?php foreach ($perfil['habilidades'] as $habilidade): ?>
+                        <li class="pill"><?= e($habilidade) ?></li>
                     <?php endforeach; ?>
                 </ul>
 
@@ -192,15 +196,13 @@ function e($texto) {
                 <h2 class="secao__titulo">Projetos</h2>
 
                 <div class="grid-projetos">
-                    <?php foreach ($projetos as $id => $p): ?>
+                    <?php foreach ($projetos as $id => $projeto): ?>
                         <article class="card-projeto">
-                            <h3 class="card-projeto__titulo"><?= e($p['titulo']) ?></h3>
-                            <p class="card-projeto__desc"><?= e($p['descricao']) ?></p>
-                            <ul class="tags">
-                                <?php foreach (explode(',', $p['tecnologias']) as $t): ?>
-                                    <li><?= e(trim($t)) ?></li>
-                                <?php endforeach; ?>
-                            </ul>
+                            <h3 class="card-projeto__titulo"><?= e($projeto['titulo']) ?></h3>
+                            <p class="card-projeto__desc"><?= e($projeto['descricao']) ?></p>
+                            <p class="card-projeto__tecnologias">
+                                Tecnologias: <?= e(implode(' · ', array_slice($projeto['tecnologias'], 0, 3))) ?>
+                            </p>
                             <a class="card-projeto__link"
                                href="?pagina=projeto&id=<?= e($id) ?>">
                                 Ver detalhes →
@@ -219,8 +221,8 @@ function e($texto) {
 
                 <h3 class="detalhe__sub">Tecnologias</h3>
                 <ul class="tags tags--grandes">
-                    <?php foreach (explode(',', $projetoAtual['tecnologias']) as $t): ?>
-                        <li><?= e(trim($t)) ?></li>
+                    <?php foreach ($projetoAtual['tecnologias'] as $tecnologia): ?>
+                        <li><?= e($tecnologia) ?></li>
                     <?php endforeach; ?>
                 </ul>
 
