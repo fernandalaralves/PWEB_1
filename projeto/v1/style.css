@@ -230,6 +230,12 @@ code { font-family: 'Space Grotesk', monospace; }
     letter-spacing: -.02em;
     margin-bottom: 2rem;
 }
+.secao__sub {
+    margin-top: -1.25rem;
+    margin-bottom: 1.5rem;
+    color: var(--texto-suave);
+    font-size: .9rem;
+}
 
 /* ---------- SOBRE ---------- */
 .sobre {
@@ -317,6 +323,10 @@ code { font-family: 'Space Grotesk', monospace; }
 .card-projeto__desc {
     color: var(--texto-suave);
     line-height: 1.7;
+}
+.card-projeto__tecnologias {
+    color: var(--texto-suave);
+    font-size: .8rem;
 }
 .tags {
     display: flex;
