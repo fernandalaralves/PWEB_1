@@ -1,8 +1,6 @@
 <?php
-
 declare(strict_types=1);
 
-// Questão 02 - este arquivo tem QUATRO erros. Corrija um de cada vez.
 class Aluno
 {
     public string $nome;
@@ -11,13 +9,14 @@ class Aluno
 
     public function apresentar(): void
     {
-      //  echo "Sou $nome, do {$this->semestre}º semestre.\n";
-          echo "Sou {$aluno->nome}, do º {$aluno->semestre}, do curso{$aluno->curso} \n";
+        echo "Sou {$this->nome}, do {$this->semestre}º semestre.\n";
     }
 }
 
 $aluno = new Aluno();
-$aluno->$nome = 'Carla';
-$aluno->semestre = '3';
-//echo "Curso: {$aluno->curso}\n";
+$aluno->nome = 'Carla';
+$aluno->semestre = 3;
+$aluno->curso = 'ADS';
+
+echo "Curso: {$aluno->curso}\n";
 $aluno->apresentar();
