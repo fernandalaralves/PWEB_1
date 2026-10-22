@@ -32,12 +32,18 @@ class Produto
     }
 }
 
-$produto = new Produto();
-$produto->nome = 'Notebook';
-$produto->preco = 3500.00;
-$produto->quantidade = 3;
+$notebook = new Produto('Notebook', 3500.00, 3);
+$mouse    = new Produto('Mouse', 59.90, 10);
+$monitor  = new Produto('Monitor', 899.00);
 
-$produto->apresentar();
-echo 'Total: R$ ' . number_format($produto->calcularTotal(), 2, ',', '.') . "\n";
-$produto->aplicarDesconto(10);
-echo 'Preço após desconto: R$ ' . number_format($produto->preco, 2, ',', '.') . "\n";
+$produtos = [$notebook, $mouse, $monitor];
+
+$totalPedido = 0.0;
+foreach ($produtos as $p) {
+    $p->apresentar();
+    $total = $p->calcularTotal();
+    echo 'Total: R$ ' . number_format($total, 2, ',', '.') . "\n\n";
+    $totalPedido += $total;
+}
+
+echo 'Total do pedido: R$ ' . number_format($totalPedido, 2, ',', '.') . "\n";
