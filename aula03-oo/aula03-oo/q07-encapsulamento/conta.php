@@ -59,3 +59,21 @@ class ContaBancaria
 $conta = new ContaBancaria('João', '12345');
 $conta->depositar(1000);
 $conta->sacar(250);
+
+try {
+    $conta->sacar(5000);
+} catch (Exception $e) {
+    echo 'Recusado: ' . $e->getMessage() . "\n";
+}
+
+try {
+    $conta->depositar(-10);
+} catch (Exception $e) {
+    echo 'Recusado: ' . $e->getMessage() . "\n";
+}
+
+echo "\nExtrato de {$conta->getTitular()}:\n";
+foreach ($conta->getExtrato() as $linha) {
+    echo '- ' . $linha['operacao'] . ': R$ ' . number_format($linha['valor'], 2, ',', '.') . "\n";
+}
+echo 'Saldo final: R$ ' . number_format($conta->getSaldo(), 2, ',', '.') . "\n";
