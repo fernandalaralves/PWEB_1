@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 class Livro
 {
-    public string $nome;
+    public string $titulo;
     public string $autor;
     public int $ano;
     public float $preco;
@@ -11,17 +11,18 @@ class Livro
 }
 
 $livro1 = new Livro();
-$livro1->nome = 'Vidas Secas';
+$livro1->titulo = 'Vidas Secas';
 $livro1->autor = 'Graciliano Ramos';
 $livro1->ano = 1938;
 $livro1->preco = 39.90;
 $livro1->disponivel = true;
 
 $livro2 = new Livro();
-$livro2->nome = 'Dracula';
-$livro2->autor = 'Bram Stocker';
-$livro2->ano = 1897;
-$livro2->preco = 40.90;
-$livro2->disponivel = true;
+$livro2->titulo = 'O Quinze';
+$livro2->autor = 'Rachel de Queiroz';
+$livro2->ano = 1930;
+$livro2->preco = 34.50;
+$livro2->disponivel = false;
 
-echo "Livro 1: {$livro1->nome}, {$livro1->autor}, {$livro1->ano}, {$livro->preco}, {$livro->disponivel}"
+echo "Livro 1: {$livro1->titulo}, {$livro1->autor}, {$livro1->ano}, {$livro1->preco}, {$livro1->disponivel}\n";
+echo "Livro 2: {$livro2->titulo}, {$livro2->autor}, {$livro2->ano}, {$livro2->preco}, {$livro2->disponivel}\n";
