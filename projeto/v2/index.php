@@ -236,70 +236,44 @@ function e($texto) {
         <?php if ($pagina === 'inicio'): ?>
 
             <!-- ---------- HERO ---------- -->
-            <section class="hero">
-                <span class="badge">
-                    <span class="pulso"></span> Disponível para estágio
-                </span>
-                <h1 class="hero__titulo">
-                    Desenvolvendo sistemas,<br>
-                    aprendendo <span class="grad">todos os dias.</span>
-                </h1>
                 <p class="hero__sub">
-                    <?= e($perfil->getNome()) ?> — <?= e($perfil->getCurso()) ?>
-                    | <?= e($perfil->getCampus()) ?>
+            <?= e($perfil->getNome()) ?> — <?= e($perfil->getCurso()) ?>
+    |       <?= e($perfil->getCampus()) ?>
                 </p>
-                <a href="https://github.com/fernandalaralves" class="btn-primario" target="_blank" rel="noopener noreferrer">CONECTE-SE COMIGO →</a>
-            </section>
 
             <!-- sobre mim -->
-            <section class="sobre">
-                <p class="secao__eyebrow">SOBRE MIM</p>
-                <img
-                    src="foto-perfil.jpeg"
-                    alt="Foto de Fernanda"
-                    class="sobre__foto"
-                >
                 <p class="sobre__texto"><?= e($perfil->getApresentacao()) ?></p>
-            </section>
+                <p class="sobre__local">Boa Viagem - CE <?= e($perfil->getCidade()) ?></p>
 
         <?php elseif ($pagina === 'habilidades'): ?>
 
             <!-- habilidades -->
-            <section class="secao">
-                <p class="secao__eyebrow">EXPERIÊNCIA & FERRAMENTAS</p>
-                <h2 class="secao__titulo">Habilidades</h2>
-                <p class="secao__sub"> <?= count($perfil->getHabilidades()) ?> habilidades</p>
-
-                <ul class="grid-habilidades">
-                    <?php foreach ($perfil->getHabilidades() as $habilidade): ?>
-                        <li class="pill"><?= e($habilidade) ?></li>
-                    <?php endforeach; ?>
+            <ul class="grid-habilidades">
+        <?php foreach ($perfil->getHabilidades() as $h): ?>
+             <li class="pill"><?= e($h) ?></li>
+        <?php endforeach; ?>
                 </ul>
-
-            </section>
 
         <?php elseif ($pagina === 'projetos'): ?>
 
             <!-- projetos -->
             <section class="secao">
-                <p class="secao__eyebrow">PORTFÓLIO</p>
-                <h2 class="secao__titulo">Projetos</h2>
-
                 <div class="grid-projetos">
-                    <?php foreach ($projetos as $id => $projeto): ?>
-                        <article class="card-projeto">
-                            <h3 class="card-projeto__titulo"><?= e($projeto->getTitulo()) ?></h3>
-                            <p class="card-projeto__desc"><?= e($projeto->getDescricao()) ?></p>
-                            <p class="card-projeto__tecnologias">
-                                Tecnologias: <?= e(implode(' · ', array_slice(explode(', ', $projeto->getTecnologias()), 0, 3))) ?>
-                            </p>
-                            <a class="card-projeto__link"
-                               href="?pagina=projeto&id=<?= e($id) ?>">
-                                Ver detalhes →
-                            </a>
-                        </article>
-                    <?php endforeach; ?>
-                </div>
+         <?php foreach ($perfil->getProjetos() as $id => $p): ?>
+        <article class="card-projeto">
+            <h3 class="card-projeto__titulo"><?= e($p->getTitulo()) ?></h3>
+            <p class="card-projeto__desc"><?= e($p->getDescricao()) ?></p>
+            <ul class="tags">
+                <?php foreach (explode(',', $p->getTecnologias()) as $t): ?>
+                    <li><?= e(trim($t)) ?></li>
+                <?php endforeach; ?>
+            </ul>
+            <a class="card-projeto__link" href="?pagina=projeto&id=<?= e($id) ?>">
+                Ver detalhes →
+            </a>
+        </article>
+    <?php endforeach; ?>
+</div>
             </section>
                     <?php elseif ($pagina === 'projeto' && $projetoAtual !== null): ?>
 
