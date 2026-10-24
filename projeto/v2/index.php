@@ -35,51 +35,103 @@ class Projeto {
         ];
     }
 }
-$perfil = [
-    'nome'         => 'Fernanda Lara Alves de Oliveira',
-    'curso'        => 'Análise e Desenvolvimento de Sistemas',
-    'campus'       => 'IFCE Campus Boa Viagem',
-    'cidade'       => 'Boa Viagem – CE',
-    'apresentacao' => 'Sou estudante com interesse em '
-                    . 'desenvolvimento backend,'
-                    . ' em cibersegurança e QA. '
-                    . 'Gosto de construir sistemas que resolvem problemas reais. ',
-    'habilidades'  => [
-        'Java', 'Spring Boot', 'PostgreSQL', 'JavaScript',
-        'C', 'Python', 'Vercel', 'Railway', 'Cypress', 'K6',
-    ],
-];
+// ============================================================
+// 2. OS OBJETOS
+// ============================================================
+$perfil = new Perfil(
+    'Fernanda Lara Alves de Oliveira',
+    'Análise e Desenvolvimento de Sistemas',
+    'IFCE Campus Boa Viagem',
+    'Boa Viagem – CE',
+    'Sou estudante com interesse em desenvolvimento backend, em cibersegurança e QA. Gosto de construir sistemas que resolvem problemas reais.',
+    ['Java', 'Spring Boot', 'PostgreSQL', 'JavaScript', 'C', 'Python', 'Vercel', 'Railway', 'Cypress', 'K6']
+);
 
-$projetos = [
-    1 => [
-        'titulo'      => 'Pure Seduction Lux',
-        'descricao'   => 'Sistema de e-commerce completo — loja virtual e painel '
-                       . 'administrativo — com API REST, autenticação JWT e banco '
-                       . 'de dados relacional PostgreSQL.',
-        'tecnologias' => ['Node.js', 'Express', 'React', 'Vite', 'PostgreSQL', 'JWT', 'Argon2id'],
-        'link'        => 'https://pureseductionlux.com.br',
-        'privado'     => false,
-    ],
-    2 => [
-        'titulo'      => 'A Aventura de Maya na Internet',
-        'descricao'   => 'Jogo educativo de cibersegurança para crianças de 8 a 14 '
-                       . 'anos, com narrativa interativa em que a personagem Maya '
-                       . 'restaura a internet completando missões.',
-        'tecnologias' => ['Vite 5', 'Vanilla JS', 'Web Components', 'Shadow DOM', 'Tailwind CSS', 'LocalStorage'],
-        'link'        => 'https://github.com/fernandalaralves/A-Aventura-de-Maya-na-Internet',
-        'privado'     => false,
-    ],
-    3 => [
-        'titulo'      => 'LUNETRAS',
-        'descricao'   => 'Plataforma educacional para acompanhamento do processo de '
-                       . 'alfabetização (psicogênese da língua escrita). Atuei no '
-                       . 'backend mobile em Java/Spring Boot, com autenticação JWT, '
-                       . 'rate limiting e integração com IA (LUN.AI).',
-        'tecnologias' => ['Java', 'Spring Boot', 'Spring Data JPA', 'Spring Security', 'JWT', 'Bucket4j', 'Lombok', 'Argon'],
-        'link'        => null,
-        'privado'     => true,
-    ],
-];
+$perfil->adicionarProjeto(new Projeto(
+    'Pure Seduction Lux',
+    'Sistema de e-commerce completo — loja virtual e painel administrativo — com API REST, autenticação JWT e banco de dados relacional PostgreSQL.',
+    'Node.js, Express, React, Vite, PostgreSQL, JWT, Argon2id'
+));
+
+$perfil->adicionarProjeto(new Projeto(
+    'A Aventura de Maya na Internet',
+    'Jogo educativo de cibersegurança para crianças de 8 a 14 anos, com narrativa interativa em que a personagem Maya restaura a internet completando missões.',
+    'Vite 5, Vanilla JS, Web Components, Shadow DOM, Tailwind CSS, LocalStorage'
+));
+
+$perfil->adicionarProjeto(new Projeto(
+    'LUNETRAS',
+    'Plataforma educacional para acompanhamento do processo de alfabetização (psicogênese da língua escrita). Atuei no backend mobile em Java/Spring Boot, com autenticação JWT, rate limiting e integração com IA (LUN.AI).',
+    'Java, Spring Boot, Spring Data JPA, Spring Security, JWT, Bucket4j, Lombok, Argon'
+));
+
+class Perfil {
+    private string $nome;
+    private string $curso;
+    private string $campus;
+    private string $cidade;
+    private string $apresentacao;
+    private array $habilidades;
+    private array $projetos = []; // começa vazio
+
+    public function __construct(
+        string $nome, string $curso, string $campus, string $cidade, 
+        string $apresentacao, array $habilidades
+    ) {
+        // Validação R3: pelo menos 5 habilidades
+        if (count($habilidades) < 5) {
+            throw new Exception('O perfil precisa de pelo menos 5 habilidades');
+        }
+
+        $this->nome = $nome;
+        $this->curso = $curso;
+        $this->campus = $campus;
+        $this->cidade = $cidade;
+        $this->apresentacao = $apresentacao;
+        $this->habilidades = $habilidades;
+    }
+
+    public function adicionarProjeto(Projeto $projeto): void {
+        // R3: numera a partir de 1
+        $this->projetos[count($this->projetos) + 1] = $projeto;
+    }
+
+    public function getProjeto(int $id): Projeto {
+        if (!isset($this->projetos[$id])) {
+            throw new Exception('Projeto não encontrado');
+        }
+        return $this->projetos[$id];
+    }
+
+    // Getters
+    public function getNome(): string { return $this->nome; }
+    public function getCurso(): string { return $this->curso; }
+    public function getCampus(): string { return $this->campus; }
+    public function getCidade(): string { return $this->cidade; }
+    public function getApresentacao(): string { return $this->apresentacao; }
+    public function getHabilidades(): array { return $this->habilidades; }
+    public function getProjetos(): array { return $this->projetos; }
+
+    public function paraArray(): array {
+        $projetosArray = [];
+        foreach ($this->projetos as $id => $projeto) {
+            $projetosArray[$id] = $projeto->paraArray();
+        }
+
+        return [
+            'nome' => $this->nome,
+            'curso' => $this->curso,
+            'campus' => $this->campus,
+            'cidade' => $this->cidade,
+            'apresentacao' => $this->apresentacao,
+            'habilidades' => $this->habilidades,
+            'projetos' => $projetosArray,
+        ];
+    }
+}
+
+$perfilArray = $perfil->paraArray();
+$projetos = $perfil->getProjetos();
 
 //tema: claro ou escuro (R6)
 $tema = $_GET['tema'] ?? $_COOKIE['tema'] ?? 'escuro';
@@ -102,8 +154,10 @@ if (isset($_GET['tema'])) {
 
 if (($_GET['formato'] ?? null) === 'json') {
     header('Content-Type: application/json; charset=utf-8');
+    $dadosPerfil = $perfilArray;
+    unset($dadosPerfil['projetos']);
     echo json_encode(
-        ['perfil' => $perfil, 'projetos' => $projetos],
+        ['perfil' => $dadosPerfil, 'projetos' => $perfilArray['projetos']],
         JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE
     );
     exit;
@@ -152,7 +206,7 @@ function e($texto) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= e($perfil['nome']) ?> — Perfil</title>
+    <title><?= e($perfil->getNome()) ?> — Perfil</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body class="tema-<?= e($tema) ?>">
@@ -161,7 +215,7 @@ function e($texto) {
 
     <header class="cabecalho">
         <div class="container cabecalho__inner">
-            <a href="?pagina=inicio" class="logo"><?= e($perfil['nome']) ?></a>
+            <a href="?pagina=inicio" class="logo"><?= e($perfil->getNome()) ?></a>
             <nav class="menu">
                 <a href="?pagina=inicio">Início</a>
                 <a href="?pagina=habilidades">Habilidades</a>
@@ -191,8 +245,8 @@ function e($texto) {
                     aprendendo <span class="grad">todos os dias.</span>
                 </h1>
                 <p class="hero__sub">
-                    <?= e($perfil['nome']) ?> — <?= e($perfil['curso']) ?>
-                    | <?= e($perfil['campus']) ?>
+                    <?= e($perfil->getNome()) ?> — <?= e($perfil->getCurso()) ?>
+                    | <?= e($perfil->getCampus()) ?>
                 </p>
                 <a href="https://github.com/fernandalaralves" class="btn-primario" target="_blank" rel="noopener noreferrer">CONECTE-SE COMIGO →</a>
             </section>
@@ -205,7 +259,7 @@ function e($texto) {
                     alt="Foto de Fernanda"
                     class="sobre__foto"
                 >
-                <p class="sobre__texto"><?= e($perfil['apresentacao']) ?></p>
+                <p class="sobre__texto"><?= e($perfil->getApresentacao()) ?></p>
             </section>
 
         <?php elseif ($pagina === 'habilidades'): ?>
@@ -214,10 +268,10 @@ function e($texto) {
             <section class="secao">
                 <p class="secao__eyebrow">EXPERIÊNCIA & FERRAMENTAS</p>
                 <h2 class="secao__titulo">Habilidades</h2>
-                <p class="secao__sub"> <?= count($perfil['habilidades']) ?> habilidades</p>
+                <p class="secao__sub"> <?= count($perfil->getHabilidades()) ?> habilidades</p>
 
                 <ul class="grid-habilidades">
-                    <?php foreach ($perfil['habilidades'] as $habilidade): ?>
+                    <?php foreach ($perfil->getHabilidades() as $habilidade): ?>
                         <li class="pill"><?= e($habilidade) ?></li>
                     <?php endforeach; ?>
                 </ul>
@@ -234,10 +288,10 @@ function e($texto) {
                 <div class="grid-projetos">
                     <?php foreach ($projetos as $id => $projeto): ?>
                         <article class="card-projeto">
-                            <h3 class="card-projeto__titulo"><?= e($projeto['titulo']) ?></h3>
-                            <p class="card-projeto__desc"><?= e($projeto['descricao']) ?></p>
+                            <h3 class="card-projeto__titulo"><?= e($projeto->getTitulo()) ?></h3>
+                            <p class="card-projeto__desc"><?= e($projeto->getDescricao()) ?></p>
                             <p class="card-projeto__tecnologias">
-                                Tecnologias: <?= e(implode(' · ', array_slice($projeto['tecnologias'], 0, 3))) ?>
+                                Tecnologias: <?= e(implode(' · ', array_slice(explode(', ', $projeto->getTecnologias()), 0, 3))) ?>
                             </p>
                             <a class="card-projeto__link"
                                href="?pagina=projeto&id=<?= e($id) ?>">
@@ -252,24 +306,15 @@ function e($texto) {
             <!-- ---------- detalhes de um projetoo (R4) ---------- -->
             <section class="secao detalhe">
                 <p class="secao__eyebrow">PROJETO</p>
-                <h2 class="secao__titulo"><?= e($projetoAtual['titulo']) ?></h2>
-                <p class="detalhe__desc"><?= e($projetoAtual['descricao']) ?></p>
+                <h2 class="secao__titulo"><?= e($projetoAtual->getTitulo()) ?></h2>
+                <p class="detalhe__desc"><?= e($projetoAtual->getDescricao()) ?></p>
 
                 <h3 class="detalhe__sub">Tecnologias</h3>
                 <ul class="tags tags--grandes">
-                    <?php foreach ($projetoAtual['tecnologias'] as $tecnologia): ?>
+                    <?php foreach (explode(', ', $projetoAtual->getTecnologias()) as $tecnologia): ?>
                         <li><?= e($tecnologia) ?></li>
                     <?php endforeach; ?>
                 </ul>
-
-                <?php if ($projetoAtual['privado']): ?>
-                    <p class="aviso-privado"> Repositório privado</p>
-                <?php elseif ($projetoAtual['link']): ?>
-                    <a class="btn-primario" target="_blank"
-                       href="<?= e($projetoAtual['link']) ?>">
-                        Abrir projeto →
-                    </a>
-                <?php endif; ?>
 
                 <p class="voltar">
                     <a href="?pagina=projetos">← Voltar para projetos</a>
@@ -302,7 +347,7 @@ function e($texto) {
 
     <footer class="rodape">
         <div class="container rodape__inner">
-            <p>© <?= date('Y') ?> <?= e($perfil['nome']) ?></p>
+            <p>© <?= date('Y') ?> <?= e($perfil->getNome()) ?></p>
             <p class="rodape__link">
                 <a href="?formato=json">Versão JSON</a>
                 <a href="https://github.com/fernandalaralves" target="_blank">GitHub</a>
