@@ -1,31 +1,19 @@
-# Projeto V1 — Perfil do Estudante
+# Projeto V2 — Perfil com Classes
 
 **Fernanda Lara Alves de Oliveira** · ADS · IFCE Campus Boa Viagem
 Programação Web I — Prof. Dr. Renato William Rodrigues de Souza
 
-Site pessoal em **PHP puro** (sem frameworks). Tudo roda em um único
-`index.php`, que decide o que mostrar pela query string da URL.
+Mesmo site da v1, mas reescrito com **classes em PHP**. Arrays associativos
+viraram objetos com atributos privados, getters, validação e try/catch.
 
 ---
 
 ## Como rodar
 
-O projeto pode ser executado com Docker, sem instalar PHP no Windows. Inicie o
-Docker Desktop e, no PowerShell, a partir da raiz do repositório, execute:
-
-```powershell
-Set-Location .\projeto\v1
-docker run --rm -p 8000:8000 --mount "type=bind,source=$($PWD.Path),target=/app" -w /app php:8.3-cli php -S 0.0.0.0:8000 -d display_errors=1 -d output_buffering=0
+```bash
+cd projeto/v2
+php -S localhost:8000 -d display_errors=1 -d output_buffering=0
 ```
-
-Na primeira execução, o Docker baixa a imagem oficial `php:8.3-cli`. Quando o
-terminal indicar que o servidor iniciou, abra **http://localhost:8000**. Deixe
-o terminal aberto enquanto usa o site; para parar o servidor, pressione
-`Ctrl + C`. A opção `--rm` remove o container ao encerrar, mas os arquivos do
-projeto permanecem na pasta local.
-
-Se a porta `8000` já estiver ocupada, altere o mapeamento para `-p 8001:8000`
-e abra **http://localhost:8001**.
 
 ---
 
@@ -39,107 +27,115 @@ e abra **http://localhost:8001**.
 
 ---
 
-## Rotas
+## As classes
 
-| URL | Mostra | Status |
+### Classe `Projeto`
+
+| Atributo | Tipo | Visibilidade |
 |---|---|---|
-| `/` ou `/?pagina=inicio` | Apresentação pessoal          | 200 |
-| `/?pagina=habilidades`   | Habilidades + quantidade total | 200 |
-| `/?pagina=projetos`      | Lista dos 3 projetos          | 200 |
-| `/?pagina=projeto&id=1`  | Detalhes do projeto 1         | 200 |
-| `/?pagina=projeto&id=99` | "Projeto não encontrado"      | 404 |
-| `/?pagina=xyz`           | "Página não encontrada"       | 404 |
-| `/?tema=escuro`          | Tema escuro gravado em cookie | 200 |
-| `/?tema=claro`           | Tema claro gravado em cookie  | 200 |
-| `/?formato=json`         | Dados em JSON                 | 200 |
+| `$titulo` | string | private |
+| `$descricao` | string | private |
+| `$tecnologias` | string | private |
+
+| Método | O que faz |
+|---|---|
+| `__construct($t,$d,$t)` | Valida título e guarda os dados |
+| `getTitulo()` | Retorna o título |
+| `getDescricao()` | Retorna a descrição |
+| `getTecnologias()` | Retorna as tecnologias |
+| `paraArray()` | Devolve os dados em array associativo |
+
+### Classe `Perfil`
+
+| Atributo | Tipo | Visibilidade |
+|---|---|---|
+| `$nome` | string | private |
+| `$curso` | string | private |
+| `$campus` | string | private |
+| `$cidade` | string | private |
+| `$apresentacao` | string | private |
+| `$habilidades` | array | private |
+| `$projetos` | array | private |
+
+| Método | O que faz |
+|---|---|
+| `__construct(...)` | Valida habilidades e guarda os dados |
+| `adicionarProjeto(Projeto)` | Adiciona um projeto, numerando a partir de 1 |
+| `getProjeto(int)` | Devolve o projeto ou lança exceção |
+| Getters | Para cada atributo |
+| `paraArray()` | Devolve tudo em array, com projetos convertidos |
 
 ---
-## Estrutura de arquivos
 
+## Antes e depois
+
+**V1 — 404 de projeto com `isset`:**
+```php
+if (isset($projetos[$id])) {
+    $projetoAtual = $projetos[$id];
+} else {
+    $status = 404;
+}
 ```
-projeto/v1/
-├── index.php          → aplicação completa (rotas, dados, HTML)
-├── style.css          → visual, com os dois temas (claro e escuro)
-├── foto-perfil.jpeg   → foto exibida na seção "Sobre mim"
-├── README.md          → este documento
-└── prints/
-    ├── claro.png
-    └── escuro.png
+
+**V2 — 404 de projeto com `try/catch`:**
+```php
+try {
+    $projetoAtual = $perfil->getProjeto($id);
+} catch (Exception $e) {
+    http_response_code(404);
+    $tituloErro = $e->getMessage();
+}
 ```
+
+**O que melhorou:** agora quem decide se o projeto existe é o próprio
+`Perfil` (encapsulamento). O código de fora não sabe onde os projetos estão
+guardados — só pede e trata o erro.
+
+---
+
+## As classes se recusam
+
+### Título vazio
+```
+Fatal error: Uncaught Exception: O projeto precisa de um título
+```
+Lançado no construtor de `Projeto` quando `trim($titulo) === ''`. O objeto
+**não chega a existir**.
+
+### Menos de 5 habilidades
+```
+Fatal error: Uncaught Exception: O perfil precisa de pelo menos 5 habilidades
+```
+Lançado no construtor de `Perfil` quando `count($habilidades) < 5`. O objeto
+**não chega a existir**.
 
 ---
 
 ## Saídas do terminal
 
-### Página que existe
+### Projeto que existe (id=2)
 ```bash
-curl.exe -i "http://localhost:8000/?pagina=inicio"
+curl.exe -i "http://localhost:8000/?pagina=projeto&id=2"
 ```
 ```
 HTTP/1.1 200 OK
-Content-Type: text/html; charset=utf-8
-<!DOCTYPE html>...
-```
-`200 OK` = sucesso. O corpo é o HTML da página inicial.
-O PHP define `Content-Type: text/html; charset=utf-8` antes de iniciar o HTML.
-
-### Página inexistente (404)
-```bash
-curl.exe -i "http://localhost:8000/?pagina=xyz"
-```
-```
-HTTP/1.1 404 Not Found
+Content-Type: text/html; charset=UTF-8
 ...
-<h2>Página não encontrada</h2>
+<h2 class="secao__titulo">A Aventura de Maya na Internet</h2>
 ```
-`404` vem de `http_response_code(404)`, chamado **antes** de qualquer HTML.
 
-### Projeto inexistente (404)
+### Projeto que não existe (id=99)
 ```bash
 curl.exe -i "http://localhost:8000/?pagina=projeto&id=99"
 ```
 ```
 HTTP/1.1 404 Not Found
 ...
-<h2>Projeto não encontrado</h2>
+<h2 class="secao__titulo">Projeto não encontrado</h2>
 ```
-`isset($projetos[$id])` retorna `false` → 404.
 
-### Troca de tema (cookie)
-```bash
-curl.exe -i "http://localhost:8000/?tema=escuro"
-```
-```
-HTTP/1.1 200 OK
-Set-Cookie: tema=escuro; Max-Age=2592000; HttpOnly; SameSite=Lax
-...
-<body class="tema-escuro">
-```
-Cookie válido por **30 dias**. Ele **não** aparece em `$_COOKIE` na mesma
-requisição — só na próxima. Por isso a URL tem prioridade:
-`$tema = $_GET['tema'] ?? $_COOKIE['tema'] ?? 'escuro';`
-
-Para demonstrar a persistência entre requisições no terminal, salve o cookie
-recebido e envie-o na chamada seguinte:
-```bash
-curl.exe -i -c cookies.txt "http://localhost:8000/?tema=claro"
-curl.exe -i -b cookies.txt "http://localhost:8000/?pagina=habilidades"
-```
-Na segunda resposta, confira `<body class="tema-claro">`. No navegador, a
-mesma persistência pode ser demonstrada trocando de página ou recarregando.
-
-### Tema inválido
-```bash
-curl.exe -i "http://localhost:8000/?tema=<script>"
-```
-```
-HTTP/1.1 200 OK
-...
-<body class="tema-escuro">
-```
-Valor fora de `claro`/`escuro` cai no padrão. Nada executa.
-
-### API JSON
+### API em JSON
 ```bash
 curl.exe -i "http://localhost:8000/?formato=json"
 ```
@@ -147,78 +143,39 @@ curl.exe -i "http://localhost:8000/?formato=json"
 HTTP/1.1 200 OK
 Content-Type: application/json; charset=utf-8
 
-{ "perfil": { ... }, "projetos": { ... } }
+{
+    "nome": "Fernanda Lara Alves de Oliveira",
+    "projetos": { "1": {...}, "2": {...}, "3": {...} }
+}
 ```
-`exit` logo após o `echo` impede que HTML vaze na resposta.
-
-### Log do servidor
-```
-[Sat Oct 14 18:00:00 2026] 127.0.0.1:54321 [200]: GET /
-[Sat Oct 14 18:00:10 2026] 127.0.0.1:54323 [404]: GET /?pagina=xyz
-```
-`[200]`/`[404]` é o status. O resto é IP, porta, método e caminho.
 
 ---
 
-## Onde usei cada conceito
+## Perguntas
 
-| Conceito | Onde |
-|---|---|
-| Arrays associativos | `$perfil`, `$projetos` no topo |
-| `$_GET` | `pagina`, `id`, `tema`, `formato` |
-| `$_COOKIE` | `$_COOKIE['tema'] ?? 'escuro'` |
-| `setcookie()` | Bloco que grava o tema quando vem pela URL |
-| `if / elseif / else` | Escolhe qual seção renderizar |
-| `http_response_code()` | 404 para página/projeto inexistente |
-| `header()` | Define `Content-Type` para HTML ou JSON |
-| `json_encode()` | Rota JSON (com `PRETTY_PRINT` + `UNESCAPED_UNICODE`) |
-| `exit` | Encerra após o JSON |
-| `htmlspecialchars()` | Função `e()` em toda saída |
-| `count()` | Exibe a quantidade de habilidades na página de habilidades |
-| `implode()` | Resume as três tecnologias principais em cada card de projeto |
-| Arrays de tecnologias | Alimentam o resumo dos cards, os detalhes e a resposta JSON |
-| Sintaxe `if: endif;` | Nos blocos de HTML alternados |
-| `date('Y')` | Ano no rodapé |
+**(a) Por que `json_encode($perfil)` devolve `{}`?**
+Porque os atributos são `private`. O `json_encode` só enxerga atributos
+públicos. Por isso criamos `paraArray()`.
 
----
+**(b) Os objetos `$perfil` e `$projeto` continuam na memória depois?**
+Não. PHP é *stateless*: cada requisição cria os objetos do zero e, ao final
+do script, eles são destruídos. Por isso recriamos tudo toda vez.
 
-## Decisões e dificuldades
-
-**Lógica no topo:** qualquer saída antes de `header()`/`setcookie()` gera
-*"headers already sent"*. Por isso dados, tema, JSON e roteamento vêm
-**antes** do `<!DOCTYPE html>`.
-
-**Validar o tema:** o valor vem da URL e é controlado pelo usuário. Aceitar
-só `claro`/`escuro` (allowlist) evita que algo como `?tema=<script>` seja
-refletido no `<body>`.
-
-**Detalhes por ID:** os IDs são as chaves do array `$projetos`. A página busca
-o projeto nessa estrutura; se a chave não existir, define status HTTP `404`.
-O botão de tema mantém o ID quando usado dentro dos detalhes.
-
-**Arrays e apresentação:** as tecnologias são armazenadas como arrays, não
-como texto separado por vírgulas. `implode()` monta um resumo curto para os
-cards, enquanto a página de detalhes percorre o array completo. `count()`
-conta as habilidades para exibir o total sem manter um número duplicado no
-código.
-
-**URL antes do cookie:** `setcookie()` grava na resposta, mas o cookie só
-volta em `$_COOKIE` na **próxima** requisição. Se o cookie tivesse
-prioridade, a troca de tema não funcionaria no primeiro clique.
-
-**Mais difícil:** garantir que nenhum espaço em branco saísse antes dos
-headers. Solução: um único bloco `<?php ... ?>` no topo, HTML só depois.
+**(c) Por que `private`, e não `public`?**
+Para encapsular: ninguém de fora pode mexer direto nos atributos. Só
+através dos getters e métodos. Isso protege a integridade dos dados e
+permite validar no construtor.
 
 ---
 
 ## Commits
 
 ```
-feat(projeto-v1): adiciona dados do perfil e página inicial
-feat(projeto-v1): adiciona páginas de habilidades e projetos
-feat(projeto-v1): adiciona detalhes do projeto e página 404
-feat(projeto-v1): adiciona tema claro e escuro com cookie
-feat(projeto-v1): adiciona rota em JSON
-style(projeto-v1): cria o visual com os dois temas
-docs(projeto-v1): documenta rotas e saídas do terminal
+chore(projeto-v2): copia a versão 1 como ponto de partida
+feat(projeto-v2): cria a classe Projeto com validação
+feat(projeto-v2): cria a classe Perfil com a lista de projetos
+refactor(projeto-v2): troca os arrays pelos objetos no HTML
+refactor(projeto-v2): usa getProjeto com try/catch para o 404
+refactor(projeto-v2): gera o JSON com paraArray
+docs(projeto-v2): documenta classes, validações e saídas
 ```
