@@ -157,7 +157,7 @@ if (($_GET['formato'] ?? null) === 'json') {
     $dadosPerfil = $perfilArray;
     unset($dadosPerfil['projetos']);
     echo json_encode(
-        ['perfil' => $dadosPerfil, 'projetos' => $perfilArray['projetos']],
+        $perfil->paraArray(),
         JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE
     );
     exit;
