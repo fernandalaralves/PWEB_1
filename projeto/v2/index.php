@@ -174,15 +174,19 @@ $pagina = $_GET['pagina'] ?? 'inicio';
 // Status HTTP padrão; pode virar 404 mais abaixo
 $status = 200;
 
-// Rota de detalhe de projeto (R4)
+// Rota de detalhe de projeto (R5 - v2)
 $projetoAtual = null;
-$projetoId = null;
+$tituloErro = '';
+
 if ($pagina === 'projeto') {
-    $projetoId = filter_var($_GET['id'] ?? null, FILTER_VALIDATE_INT);
-    if (is_int($projetoId) && isset($projetos[$projetoId])) {
-        $projetoAtual = $projetos[$projetoId];
-    } else {
+    $id = (int) ($_GET['id'] ?? 0);
+    try {
+        $projetoAtual = $perfil->getProjeto($id);
+        // $titulo = $projetoAtual->getTitulo(); // não precisa, usamos direto no HTML
+    } catch (Exception $e) {
         $status = 404;
+        $pagina = 'nao-encontrado';
+        $tituloErro = $e->getMessage(); // "Projeto não encontrado"
     }
 }
 
@@ -285,8 +289,8 @@ function e($texto) {
 
                 <h3 class="detalhe__sub">Tecnologias</h3>
                 <ul class="tags tags--grandes">
-                    <?php foreach (explode(', ', $projetoAtual->getTecnologias()) as $tecnologia): ?>
-                        <li><?= e($tecnologia) ?></li>
+                    <?php foreach (explode(',', $projetoAtual->getTecnologias()) as $t): ?>
+                        <li><?= e(trim($t)) ?></li>
                     <?php endforeach; ?>
                 </ul>
 
@@ -295,13 +299,13 @@ function e($texto) {
                 </p>
             </section>
 
-        <?php elseif ($pagina === 'projeto'): ?>
+        <?php elseif ($pagina === 'nao-encontrado' || $pagina === 'projeto'): ?>
 
-            <!-- ---------- projeto nao encontrado (404) ---------- -->
+            <!-- Página 404 de projeto -->
             <section class="secao erro-404">
                 <p class="secao__eyebrow">ERRO 404</p>
                 <h2 class="secao__titulo">Projeto não encontrado</h2>
-                <p>O projeto <code>#<?= e($_GET['id'] ?? '?') ?></code> não existe.</p>
+                <p>O projeto solicitado não existe.</p>
                 <a href="?pagina=projetos" class="btn-primario">Ver todos os projetos</a>
             </section>
 
